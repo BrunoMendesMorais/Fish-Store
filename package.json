@@ -1,0 +1,26 @@
+{
+  "name": "fish-store",
+  "version": "1.0.0",
+  "description": "Sistema de loja virtual de produtos de pesca",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrunoMendesMorais/Fish-Store.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BrunoMendesMorais/Fish-Store/issues"
+  },
+  "homepage": "https://github.com/BrunoMendesMorais/Fish-Store#readme",
+  "dependencies": {
+    "@types/node": "^26.6.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
+  }
+}
