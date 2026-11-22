@@ -44,84 +44,84 @@ export class CompraRepository {
     carrinhoRepository = CarrinhoRepository.getInstance();
     itemCompraRepository = ItemCompraRepository.getInstance();
 
-    async finalizaCompra(
-        id_cliente: number
-    ): Promise<Compra | undefined> {
+    // async finalizaCompra( id_cliente: number): Promise<Compra | undefined> {
+    //     const conexao = await banco.getConnection();
+    //     try {
+    //         await conexao.beginTransaction();
+    //         const itens = await this.carrinhoRepository.listaItens(
+    //             id_cliente,
+    //             conexao
+    //         );
 
-        const conexao = await banco.getConnection();
+    //         if (itens.length === 0) {
+    //             await conexao.rollback();
+    //             return undefined;
+    //         }
 
-        try {
-            await conexao.beginTransaction();
-            const itens = await this.carrinhoRepository.listaItens(
-                id_cliente,
-                conexao
-            );
+    //         const resultado = await executarComandoSQL<ResultSetHeader>(
+    //             `INSERT INTO compra (id_cliente, data)
+    //             VALUES (?, CURRENT_TIMESTAMP)`,
+    //             [id_cliente],
+    //             conexao
+    //         );
 
-            if (itens.length === 0) {
-                await conexao.rollback();
-                return undefined;
-            }
+    //         const idGerado = resultado.insertId;
 
-            const resultado = await executarComandoSQL<ResultSetHeader>(
-                `INSERT INTO compra (id_cliente, data)
-                VALUES (?, CURRENT_TIMESTAMP)`,
-                [id_cliente],
-                conexao
-            );
+    //         for (const item of itens) {
+    //             const novoItem = new ItemCompra(
+    //                 item.id_produto,
+    //                 idGerado,
+    //                 item.quantidade,
+    //             );
 
-            const idGerado = resultado.insertId;
+    //             await this.itemCompraRepository.insereItem(
+    //                 novoItem,
+    //                 conexao
+    //             );
+    //         }
 
-            for (const item of itens) {
-                const novoItem = new ItemCompra(
-                    0,
-                    idGerado,
-                    item.id_produto,
-                    item.quantidade
-                );
+    //         await this.carrinhoRepository.limpaCarrinho(
+    //             id_cliente,
+    //             conexao
+    //         );
 
-                await this.itemCompraRepository.insereItem(
-                    novoItem,
-                    conexao
-                );
-            }
+    //         const linhas = await executarComandoSQL<RowDataPacket[]>(
+    //             `SELECT * FROM compra WHERE id_compra = ?`,
+    //             [idGerado],
+    //             conexao
+    //         );
 
-            await this.carrinhoRepository.limpaCarrinho(
-                id_cliente,
-                conexao
-            );
+    //         if (linhas.length === 0) {
+    //             throw new Error(
+    //                 'Compra não encontrada após inserção.'
+    //             );
+    //         }
 
-            const linhas = await executarComandoSQL<RowDataPacket[]>(
-                `SELECT * FROM compra WHERE id_compra = ?`,
-                [idGerado],
-                conexao
-            );
+    //         const linha = linhas[0];
 
-            if (linhas.length === 0) {
-                throw new Error(
-                    'Compra não encontrada após inserção.'
-                );
-            }
+    //         const novaCompra = new Compra(
+    //             linha.id_compra,
+    //             linha.id_cliente,
+    //             linha.data,
+    //             linha.status,
+    //             linha.valor_total,
+    //             linha.sub_total,
+    //             linha.valorFrete,
+    //             linha.id_pagamento
+    //         );
 
-            const linha = linhas[0];
+    //         await conexao.commit();
 
-            const novaCompra = new Compra(
-                linha.id_compra,
-                linha.id_cliente,
-                linha.data
-            );
+    //         return novaCompra;
 
-            await conexao.commit();
+    //     } catch (error) {
+    //         await conexao.rollback();
+    //         throw error;
 
-            return novaCompra;
-
-        } catch (error) {
-            await conexao.rollback();
-            throw error;
-
-        } finally {
-            conexao.release();
-        }
-    }
+    //     } finally {
+    //         conexao.release();
+    //     }
+    // }
 
     async listaCompras(id_cliente: number): Promise<Compra[]> {
 
@@ -136,7 +136,12 @@ export class CompraRepository {
             return new Compra(
                 linha.id_compra,
                 linha.id_cliente,
-                linha.data
+                linha.data,
+                linha.status,
+                linha.valor_total,
+                linha.sub_total,
+                linha.valorFrete,
+                linha.id_pagamento
             );
         });
     }
@@ -161,7 +166,12 @@ export class CompraRepository {
         return new Compra(
             linha.id_compra,
             linha.id_cliente,
-            linha.data
+            linha.data,
+            linha.status,
+            linha.valor_total,
+            linha.sub_total,
+            linha.valorFrete,
+            linha.id_pagamento
         );
     }
 }

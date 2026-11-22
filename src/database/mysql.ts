@@ -19,7 +19,6 @@ const dbConfig = {
     dateStrings: true
 };
 
-// Criação do pool de conexões
 export const banco = mysql.createPool({
     ...dbConfig,
     waitForConnections: true,
@@ -27,7 +26,6 @@ export const banco = mysql.createPool({
     queueLimit: 0
 });
 
-// Método centralizado para executar SQL
 export async function executarComandoSQL<T = any>(
     query: string,
     valores: any[] = [],
@@ -46,7 +44,7 @@ export async function executarComandoSQL<T = any>(
     }
 }
 
-// Testa a conexão com o banco
+
 export async function testarConexao(): Promise<void> {
     try {
         const connection = await banco.getConnection();
@@ -61,7 +59,6 @@ export async function testarConexao(): Promise<void> {
     }
 }
 
-// Inicializa as tabelas
 export async function inicializarBanco(): Promise<void> {
     console.log('Sincronizando schemas do banco de dados...');
 
@@ -96,7 +93,6 @@ export async function inicializarBanco(): Promise<void> {
     }
 }
 
-// Encerra o pool
 export async function fecharConexao(): Promise<void> {
     await banco.end();
     console.log('Pool de conexões encerrado.');
