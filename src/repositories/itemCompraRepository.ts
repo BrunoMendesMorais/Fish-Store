@@ -54,7 +54,10 @@ export class ItemCompraRepository {
                 linha.id_item,
                 linha.id_compra,
                 linha.id_produto,
-                linha.quantidade
+                linha.quantidade,
+                linha.preco_final_unidade,
+                linha.desconto,
+                linha.preco_total_produto
             )
         })
 
