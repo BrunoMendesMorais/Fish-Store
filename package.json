@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Sistema de loja virtual de produtos de pesca",
   "main": "index.js",
-  " scripts ": {
-    " start ": " node dist / app.js",
-    " build ": "npx tsc",
-    " dev": "ts - node src/ app.ts"
+  "scripts": {
+    "start": "node dist/app.js",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,6 @@
   "homepage": "https://github.com/BrunoMendesMorais/Fish-Store#readme",
   "dependencies": {
     "@types/express": "^5.0.6",
-    "@types/node": "^26.6.5",
     "@types/prompt-sync": "^4.2.3",
     "express": "^5.3.0",
     "mysql2": "^3.24.6",
@@ -30,6 +29,8 @@
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@types/node": "^26.6.6",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.3"
   }
 }
