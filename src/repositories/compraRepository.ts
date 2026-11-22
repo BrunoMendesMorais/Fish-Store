@@ -1,6 +1,6 @@
 
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
-import { dbConfig, executarComandoSQL } from '../database/mysql';
+import { banco, executarComandoSQL } from '../database/mysql';
 import { Compra } from '../models/compra';
 import { ItemCompra } from '../models/itemCompra';
 import { CarrinhoRepository } from './carrinhoRepository';
@@ -8,8 +8,30 @@ import { ItemCompraRepository } from './itemCompraRepository';
 
 export class CompraRepository {
     private static instance: CompraRepository;
-
     private constructor() {}
+
+    static getCreateTableQuery(): string {
+        return `
+        CREATE TABLE IF NOT EXISTS compra (
+            id_compra INT AUTO_INCREMENT PRIMARY KEY,
+            id_cliente INT NOT NULL,
+            data DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            status VARCHAR(30) NOT NULL DEFAULT 'pendente',
+            valor_total DECIMAL(10,2) NOT NULL,
+            sub_total DECIMAL(10,2) NOT NULL,
+            valor_frete DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            id_pagamento INT NOT NULL,
+
+            CONSTRAINT fk_compra_usuario
+                FOREIGN KEY (id_cliente)
+                REFERENCES usuario(id_cliente),
+
+            CONSTRAINT fk_compra_tipo_pagamento
+                FOREIGN KEY (id_pagamento)
+                REFERENCES tipo_pagamento(id_pagamento)
+        ) ENGINE=InnoDB;
+        `;
+    }
 
     public static getInstance(): CompraRepository {
         if (!this.instance) {
@@ -26,12 +48,10 @@ export class CompraRepository {
         id_cliente: number
     ): Promise<Compra | undefined> {
 
-        const conexao = await dbConfig.getConnection();
+        const conexao = await banco.getConnection();
 
         try {
             await conexao.beginTransaction();
-
-            // Busca e bloqueia os itens do carrinho
             const itens = await this.carrinhoRepository.listaItens(
                 id_cliente,
                 conexao
