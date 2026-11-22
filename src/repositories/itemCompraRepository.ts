@@ -1,6 +1,6 @@
 
 import { PoolConnection, RowDataPacket } from 'mysql2/promise'
-import { banco } from '../database/mysql'
+import { dbConfig as dbConfig } from '../database/mysql'
 import { ItemCompra } from '../models/itemCompra'
 
 export class ItemCompraRepository {
@@ -22,7 +22,7 @@ export class ItemCompraRepository {
     }
 
     async listaItens(id_compra: number): Promise<ItemCompra[]> {
-        const [linhas] = await banco.execute<RowDataPacket[]>(
+        const [linhas] = await dbConfig.execute<RowDataPacket[]>(
             "SELECT * FROM Item_Compra WHERE id_compra = ? ORDER BY id_item",
             [id_compra]
         )
