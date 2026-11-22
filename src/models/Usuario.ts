@@ -3,6 +3,7 @@ export class Usuario {
         public id_cliente: number,
         public email: string,
         public senha: string,
+        public token: string,
         public nome: string,
         public telefone: string | null,
         public adm: boolean,
