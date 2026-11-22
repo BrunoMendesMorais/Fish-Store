@@ -4,19 +4,19 @@ import { CompraService } from '../services/compraService';
 export class CompraController {
     compraService = new CompraService();
 
-    async finalizaCompra(req: Request, res: Response) {
-        try {
-            const compra = await this.compraService.finalizaCompra(Number(req.params.id_cliente));
-            res.status(201).json(compra);
-        } catch (erro) {
-            if (erro instanceof Error && (erro.cause === 400 || erro.cause === 409)) {
-                res.status(erro.cause).json({ message: erro.message });
-            } else {
-                console.error(erro);
-                res.status(500).json({ message: 'Erro ao finalizar compra.' });
-            }
-        }
-    }
+    // async finalizaCompra(req: Request, res: Response) {
+    //     try {
+    //         const compra = await this.compraService.finalizaCompra(Number(req.params.id_cliente));
+    //         res.status(201).json(compra);
+    //     } catch (erro) {
+    //         if (erro instanceof Error && (erro.cause === 400 || erro.cause === 409)) {
+    //             res.status(erro.cause).json({ message: erro.message });
+    //         } else {
+    //             console.error(erro);
+    //             res.status(500).json({ message: 'Erro ao finalizar compra.' });
+    //         }
+    //     }
+    // }
 
     async listaCompras(req: Request, res: Response) {
         try {
