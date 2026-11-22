@@ -1,120 +1,177 @@
 
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise'
-import { banco } from '../database/mysql'
-import { Compra } from '../models/compra'
-import { ItemCompra } from '../models/itemCompra'
-import { CarrinhoRepository } from './carrinhoRepository'
-import { ItemCompraRepository } from './itemCompraRepository'
+import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { banco, executarComandoSQL } from '../database/mysql';
+import { Compra } from '../models/compra';
+import { ItemCompra } from '../models/itemCompra';
+import { CarrinhoRepository } from './carrinhoRepository';
+import { ItemCompraRepository } from './itemCompraRepository';
 
 export class CompraRepository {
-    private static instance: CompraRepository
+    private static instance: CompraRepository;
     private constructor() {}
+
+    static getCreateTableQuery(): string {
+        return `
+        CREATE TABLE IF NOT EXISTS compra (
+            id_compra INT AUTO_INCREMENT PRIMARY KEY,
+            id_cliente INT NOT NULL,
+            data DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            status VARCHAR(30) NOT NULL DEFAULT 'pendente',
+            valor_total DECIMAL(10,2) NOT NULL,
+            sub_total DECIMAL(10,2) NOT NULL,
+            valor_frete DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            id_pagamento INT NOT NULL,
+
+            CONSTRAINT fk_compra_usuario
+                FOREIGN KEY (id_cliente)
+                REFERENCES usuario(id_cliente),
+
+            CONSTRAINT fk_compra_tipo_pagamento
+                FOREIGN KEY (id_pagamento)
+                REFERENCES tipo_pagamento(id_pagamento)
+        ) ENGINE=InnoDB;
+        `;
+    }
 
     public static getInstance(): CompraRepository {
         if (!this.instance) {
-            this.instance = new CompraRepository()
+            this.instance = new CompraRepository();
         }
-        return this.instance
+
+        return this.instance;
     }
 
-    carrinhoRepository = CarrinhoRepository.getInstance()
-    itemCompraRepository = ItemCompraRepository.getInstance()
+    carrinhoRepository = CarrinhoRepository.getInstance();
+    itemCompraRepository = ItemCompraRepository.getInstance();
 
-    async finalizaCompra(id_cliente: number): Promise<Compra | undefined> {
-        const conexao = await banco.getConnection()
+    // async finalizaCompra( id_cliente: number): Promise<Compra | undefined> {
+    //     const conexao = await banco.getConnection();
+    //     try {
+    //         await conexao.beginTransaction();
+    //         const itens = await this.carrinhoRepository.listaItens(
+    //             id_cliente,
+    //             conexao
+    //         );
 
-        try {
-            await conexao.beginTransaction()
+    //         if (itens.length === 0) {
+    //             await conexao.rollback();
+    //             return undefined;
+    //         }
 
-            const itens = await this.carrinhoRepository.listaItens(id_cliente, conexao)
+    //         const resultado = await executarComandoSQL<ResultSetHeader>(
+    //             `INSERT INTO compra (id_cliente, data)
+    //             VALUES (?, CURRENT_TIMESTAMP)`,
+    //             [id_cliente],
+    //             conexao
+    //         );
 
-            if (itens.length === 0) {
-                await conexao.rollback()
-                return undefined
-            }
+    //         const idGerado = resultado.insertId;
 
-            const [resultado] = await conexao.execute<ResultSetHeader>(
-                "INSERT INTO Compra (id_cliente, data) VALUES (?, CURRENT_TIMESTAMP)",
-                [id_cliente]
-            )
+    //         for (const item of itens) {
+    //             const novoItem = new ItemCompra(
+    //                 item.id_produto,
+    //                 idGerado,
+    //                 item.quantidade,
+    //             );
 
-            const idGerado = resultado.insertId
+    //             await this.itemCompraRepository.insereItem(
+    //                 novoItem,
+    //                 conexao
+    //             );
+    //         }
 
-            for (const item of itens) {
-                const novoItem = new ItemCompra(
-                    0,
-                    idGerado,
-                    item.id_produto,
-                    item.quantidade
-                )
+    //         await this.carrinhoRepository.limpaCarrinho(
+    //             id_cliente,
+    //             conexao
+    //         );
 
-                await this.itemCompraRepository.insereItem(novoItem, conexao)
-            }
+    //         const linhas = await executarComandoSQL<RowDataPacket[]>(
+    //             `SELECT * FROM compra WHERE id_compra = ?`,
+    //             [idGerado],
+    //             conexao
+    //         );
 
-            await this.carrinhoRepository.limpaCarrinho(id_cliente, conexao)
+    //         if (linhas.length === 0) {
+    //             throw new Error(
+    //                 'Compra não encontrada após inserção.'
+    //             );
+    //         }
 
-            const [linhas] = await conexao.execute<RowDataPacket[]>(
-                "SELECT * FROM Compra WHERE id_compra = ?",
-                [idGerado]
-            )
+    //         const linha = linhas[0];
 
-            if (linhas.length === 0) {
-                throw new Error("Compra não encontrada após inserção.")
-            }
+    //         const novaCompra = new Compra(
+    //             linha.id_compra,
+    //             linha.id_cliente,
+    //             linha.data,
+    //             linha.status,
+    //             linha.valor_total,
+    //             linha.sub_total,
+    //             linha.valorFrete,
+    //             linha.id_pagamento
+    //         );
 
-            const linha = linhas[0]
+    //         await conexao.commit();
 
-            const novaCompra = new Compra(
-                linha.id_compra,
-                linha.id_cliente,
-                linha.data
-            )
+    //         return novaCompra;
 
-            await conexao.commit()
+    //     } catch (error) {
+    //         await conexao.rollback();
+    //         throw error;
 
-            return novaCompra
-
-        } catch (error) {
-            await conexao.rollback()
-            throw error
-        } finally {
-            conexao.release()
-        }
-    }
+    //     } finally {
+    //         conexao.release();
+    //     }
+    // }
 
     async listaCompras(id_cliente: number): Promise<Compra[]> {
-        const [linhas] = await banco.execute<RowDataPacket[]>(
-            "SELECT * FROM Compra WHERE id_cliente = ? ORDER BY id_compra",
-            [id_cliente]
-        )
 
-        const compras: Compra[] = linhas.map((linha: any) => {
+        const linhas = await executarComandoSQL<RowDataPacket[]>(
+            `SELECT * FROM compra
+            WHERE id_cliente = ?
+            ORDER BY id_compra`,
+            [id_cliente]
+        );
+
+        return linhas.map((linha) => {
             return new Compra(
                 linha.id_compra,
                 linha.id_cliente,
-                linha.data
-            )
-        })
-
-        return compras
+                linha.data,
+                linha.status,
+                linha.valor_total,
+                linha.sub_total,
+                linha.valorFrete,
+                linha.id_pagamento
+            );
+        });
     }
 
-    async listaCompraID(id_cliente: number, id_compra: number): Promise<Compra | undefined> {
-        const [linhas] = await banco.execute<RowDataPacket[]>(
-            "SELECT * FROM Compra WHERE id_compra = ? AND id_cliente = ?",
+    async listaCompraID(
+        id_cliente: number,
+        id_compra: number
+    ): Promise<Compra | undefined> {
+
+        const linhas = await executarComandoSQL<RowDataPacket[]>(
+            `SELECT * FROM compra
+            WHERE id_compra = ? AND id_cliente = ?`,
             [id_compra, id_cliente]
-        )
+        );
 
         if (linhas.length === 0) {
-            return undefined
+            return undefined;
         }
 
-        const linha = linhas[0]
+        const linha = linhas[0];
 
         return new Compra(
             linha.id_compra,
             linha.id_cliente,
-            linha.data
-        )
+            linha.data,
+            linha.status,
+            linha.valor_total,
+            linha.sub_total,
+            linha.valorFrete,
+            linha.id_pagamento
+        );
     }
 }

@@ -5,16 +5,16 @@ export class CompraService {
     compraRepository = CompraRepository.getInstance()
 
 
-    async finalizaCompra(id_cliente: number): Promise<Compra> {
-        if (!Number.isInteger(id_cliente) || id_cliente <= 0 || id_cliente > 2147483647) {
-            throw new Error('id_cliente deve ser um inteiro positivo valido.', { cause: 400 });
-        }
-        const compra = await this.compraRepository.finalizaCompra(id_cliente);
-        if (!compra) {
-            throw new Error('O carrinho esta vazio.', { cause: 409 });
-        }
-        return compra;
-    }
+    // async finalizaCompra(id_cliente: number): Promise<Compra> {
+    //     if (!Number.isInteger(id_cliente) || id_cliente <= 0 || id_cliente > 2147483647) {
+    //         throw new Error('id_cliente deve ser um inteiro positivo valido.', { cause: 400 });
+    //     }
+    //     const compra = await this.compraRepository.finalizaCompra(id_cliente);
+    //     if (!compra) {
+    //         throw new Error('O carrinho esta vazio.', { cause: 409 });
+    //     }
+    //     return compra;
+    // }
 
     async listaCompras(id_cliente: number): Promise<Compra[]> {
         if (!Number.isInteger(id_cliente) || id_cliente <= 0 || id_cliente > 2147483647) {
