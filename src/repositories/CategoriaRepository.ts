@@ -1,4 +1,6 @@
+import { promises } from "node:dns";
 import { Categoria } from "../models/Categoria";
+import { executarComandoSQL } from "../database/mysql";
 
 
 export class CategoriaRepository {
@@ -21,4 +23,26 @@ export class CategoriaRepository {
         }
         return this.instance;
     }
+
+    private mapearCategoria(linha: any): Categoria {
+        return new Categoria(
+            linha.id_categoria,
+            linha.nome
+        );
+    }
+
+    async listaCategorias(): Promise<Categoria[]> {
+        const linhas = await executarComandoSQL(
+            `SELECT id_categoria, nome
+            FROM categoria`,
+            []
+        );
+
+        const categorias: Categoria[] = linhas.map((linha: any) => {
+            return this.mapearCategoria(linha);
+        });
+
+        return categorias;
+    }
+
 }
