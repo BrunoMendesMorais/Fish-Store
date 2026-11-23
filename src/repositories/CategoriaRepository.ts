@@ -45,4 +45,25 @@ export class CategoriaRepository {
         return categorias;
     }
 
+    async listaCategoriaPorId(id: number): Promise <Categoria | null>{
+        const resultado = await executarComandoSQL(
+            `SELECT id_categoria, nome
+            FROM categoria
+            WHERE id_categoria = ?`,
+            [id]
+        );
+
+        return resultado.length > 0 ? this.mapearCategoria(resultado[0]) : null;
+    }
+
+    async existeCategoriaPorNome(nome: String): Promise<boolean>{
+        const resultado = await executarComandoSQL(
+            `SELECT id_categoria from categoria WHERE nome = ?`,
+            [nome]
+        );
+
+        return resultado.length > 0;
+        
+    }
+
 }
