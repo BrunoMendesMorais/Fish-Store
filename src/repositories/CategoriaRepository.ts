@@ -104,4 +104,32 @@ export class CategoriaRepository {
         return resultado.length > 0;
     }
 
+    async possuiProdutoAssociados(id: number): Promise<boolean>{
+        const resultado = await executarComandoSQL(
+            `SELECT id_produto
+            FROM produto
+            WHERE id_categoria = ?
+            LIMIT 1`
+            [id]
+        );
+
+        return resultado.length > 0;
+    }
+
+    async excluirCategoria(id: number): Promise<boolean>{
+        const possuiProdutos = await this.possuiProdutoAssociados(id);
+
+        if(possuiProdutos){
+            return false;
+        }
+
+        await executarComandoSQL(
+            `DELETE FROM categoria
+            WHERE id_categoria = ?`,
+            [id]
+        );
+
+        return true;
+    }
+
 }
