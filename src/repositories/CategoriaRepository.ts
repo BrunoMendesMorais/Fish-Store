@@ -66,4 +66,42 @@ export class CategoriaRepository {
         
     }
 
+    async cadastraCategoria(categoria: Categoria): Promise<Categoria | null>{
+        await executarComandoSQL(
+            `INSERT INTO categoria (nome)
+            VALUES (?)`,
+            [categoria.nome]
+        );
+
+        const resultado = await executarComandoSQL(
+            `SELECT id_categoria, nome
+            FROM categoria
+            WHERE id_categoria = LAST_INSERT_ID()`,
+            []
+        );
+
+        return resultado.length > 0 ? this.mapearCategoria(resultado[0]): null;
+    }
+
+    async atualizarCategoria(categoria: Categoria): Promise<boolean>{
+        await executarComandoSQL(
+            `UPDATE categoria
+            SET nome = ?
+            WHERE id_categoria = ?`,
+            [
+                categoria.nome,
+                categoria.id_categoria
+            ]
+        );
+
+        const resultado = await executarComandoSQL(
+            `SELECT id_categoria
+            FROM categoria
+            WHERE id_categoria = ?`,
+            [categoria.id_categoria]
+        );
+
+        return resultado.length > 0;
+    }
+
 }
