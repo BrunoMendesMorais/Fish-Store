@@ -66,6 +66,17 @@ export class CategoriaRepository {
         
     }
 
+    async existeOutraCategoriaComNome(nome: string, id: number): Promise<boolean>{
+        const resultado = await executarComandoSQL(
+            `SELECT id_categoria
+            FROM categoria
+            WHERE nome = ?
+            AND id_categoria <> ?`,
+            [nome, id]
+        );
+        return resultado.length > 0;
+    }
+
     async cadastraCategoria(categoria: Categoria): Promise<Categoria | null>{
         await executarComandoSQL(
             `INSERT INTO categoria (nome)
