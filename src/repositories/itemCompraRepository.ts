@@ -1,7 +1,7 @@
 
 import { PoolConnection, RowDataPacket } from 'mysql2/promise'
 import banco  from '../database/mysql'
-import { ItemCompra } from '../models/itemCompra'
+import { ItemCompra } from '../models/ItemCompra'
 
 export class ItemCompraRepository {
     private static instance: ItemCompraRepository

@@ -1,4 +1,4 @@
-import { ItemCompra } from '../models/itemCompra';
+import { ItemCompra } from '../models/ItemCompra';
 import { CompraRepository } from '../repositories/compraRepository';
 import { ItemCompraRepository } from '../repositories/itemCompraRepository';
 

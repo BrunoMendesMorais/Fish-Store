@@ -1,8 +1,8 @@
 
 import { PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { banco, executarComandoSQL } from '../database/mysql';
-import { Compra } from '../models/compra';
-import { ItemCompra } from '../models/itemCompra';
+import { Compra } from '../models/Compra';
+import { ItemCompra } from '../models/ItemCompra';
 import { CarrinhoRepository } from './carrinhoRepository';
 import { ItemCompraRepository } from './itemCompraRepository';
 

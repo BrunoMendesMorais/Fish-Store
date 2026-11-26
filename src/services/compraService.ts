@@ -1,4 +1,4 @@
-import { Compra } from '../models/compra';
+import { Compra } from '../models/Compra';
 import { CompraRepository } from '../repositories/compraRepository';
 
 export class CompraService {

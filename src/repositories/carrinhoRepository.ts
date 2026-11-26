@@ -55,11 +55,7 @@ export class CarrinhoRepository {
         );
     }
 
-    async listaItens(
-        id_cliente: number,
-        conexao?: PoolConnection
-    ): Promise<Carrinho[]> {
-
+    async listaItens(id_cliente: number, conexao?: PoolConnection): Promise<Carrinho[]> {
         let sql = `
             SELECT * FROM carrinho_itens
             WHERE id_cliente = ?
@@ -70,11 +66,7 @@ export class CarrinhoRepository {
             sql += ' FOR UPDATE';
         }
 
-        const linhas = await executarComandoSQL<RowDataPacket[]>(
-            sql,
-            [id_cliente],
-            conexao
-        );
+        const linhas = await executarComandoSQL<RowDataPacket[]>(sql,[id_cliente],conexao);
 
         return linhas.map((linha) => {
             return new Carrinho(
@@ -86,12 +78,7 @@ export class CarrinhoRepository {
         });
     }
 
-    async atualizaQuantidade(
-        id_cliente: number,
-        id_item: number,
-        quantidade: number
-    ): Promise<boolean> {
-
+    async atualizaQuantidade(id_cliente: number,id_item: number,quantidade: number): Promise<boolean> {
         const resultado = await executarComandoSQL<ResultSetHeader>(
             `UPDATE carrinho_itens
             SET quantidade = ?
@@ -102,11 +89,7 @@ export class CarrinhoRepository {
         return resultado.affectedRows > 0;
     }
 
-    async removeItem(
-        id_cliente: number,
-        id_item: number
-    ): Promise<boolean> {
-
+    async removeItem(id_cliente: number,id_item: number): Promise<boolean> {
         const resultado = await executarComandoSQL<ResultSetHeader>(
             `DELETE FROM carrinho_itens
             WHERE id_item = ? AND id_cliente = ?`,
@@ -116,15 +99,10 @@ export class CarrinhoRepository {
         return resultado.affectedRows > 0;
     }
 
-    async limpaCarrinho(
-        id_cliente: number,
-        conexao: PoolConnection
-    ): Promise<void> {
-
+    async limpaCarrinho(id_cliente: number,conexao: PoolConnection): Promise<void> {
         await executarComandoSQL(
             `DELETE FROM carrinho_itens WHERE id_cliente = ?`,
-            [id_cliente],
-            conexao
+            [id_cliente], conexao
         );
     }
 }
