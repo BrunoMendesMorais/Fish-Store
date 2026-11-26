@@ -1,3 +1,4 @@
+import { promises } from "node:dns";
 import { Categoria } from "../models/Categoria";
 import { CategoriaRepository } from "../repositories/CategoriaRepository";
 
@@ -28,6 +29,19 @@ export class CategoriaService{
         const categoria = new Categoria(0, nome);
 
         return await this.categoriaRepository.cadastraCategoria(categoria);
+    }
+
+    async listarCategorias(): Promise<Categoria[]>{
+        return await this.categoriaRepository.listaCategorias();
+    }
+
+    async buscarCategoriaPorId(id: number): Promise<Categoria | null>{
+        const categoria = await this.categoriaRepository.listaCategoriaPorId(id);
+        
+        if(categoria === null){
+            throw new Error("A categoria informada não foi encontrada");
+        }
+        return categoria;
     }
 
 
