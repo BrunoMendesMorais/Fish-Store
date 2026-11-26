@@ -1,8 +1,7 @@
 import express from "express"
 import router from "./routes/router"
 import { inicializarBanco } from "./database/mysql"
-import dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config'
 
 const app = express()
 
