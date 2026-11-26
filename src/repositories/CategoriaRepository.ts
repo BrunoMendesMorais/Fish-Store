@@ -1,4 +1,4 @@
-import { promises } from "node:dns";
+
 import { Categoria } from "../models/Categoria";
 import { executarComandoSQL } from "../database/mysql";
 
@@ -56,7 +56,7 @@ export class CategoriaRepository {
         return resultado.length > 0 ? this.mapearCategoria(resultado[0]) : null;
     }
 
-    async existeCategoriaPorNome(nome: String): Promise<boolean>{
+    async existeCategoriaPorNome(nome: string): Promise<boolean>{
         const resultado = await executarComandoSQL(
             `SELECT id_categoria from categoria WHERE nome = ?`,
             [nome]
@@ -104,12 +104,12 @@ export class CategoriaRepository {
         return resultado.length > 0;
     }
 
-    async possuiProdutoAssociados(id: number): Promise<boolean>{
+    async possuiProdutosAssociados(id: number): Promise<boolean>{
         const resultado = await executarComandoSQL(
             `SELECT id_produto
             FROM produto
             WHERE id_categoria = ?
-            LIMIT 1`
+            LIMIT 1`,
             [id]
         );
 
@@ -117,7 +117,7 @@ export class CategoriaRepository {
     }
 
     async excluirCategoria(id: number): Promise<boolean>{
-        const possuiProdutos = await this.possuiProdutoAssociados(id);
+        const possuiProdutos = await this.possuiProdutosAssociados(id);
 
         if(possuiProdutos){
             return false;
