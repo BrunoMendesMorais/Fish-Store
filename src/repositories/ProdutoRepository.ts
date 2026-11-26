@@ -1,4 +1,11 @@
+import { Produto } from "../models/Produto";
+import { executarComandoSQL } from "../database/mysql";
+
 export class ProdutoRepository {
+    private static instance: ProdutoRepository
+
+    private constructor(){}
+
     static getCreateTableQuery(): string {
         return `
         CREATE TABLE IF NOT EXISTS produto (
@@ -17,5 +24,50 @@ export class ProdutoRepository {
                 REFERENCES categoria(id_categoria)
         ) ENGINE=InnoDB;
         `;
+    }
+
+    private static getInstance(): ProdutoRepository{
+        if(!this.instance){
+            this.instance = new ProdutoRepository()
+        }
+        return this.instance
+    }
+
+    private mapearProduto(linha: any): Produto{
+        return new Produto(
+            linha.id_produto,
+            linha.nome,
+            linha.descricao ?? null,
+            Number(linha.preco_unidade),
+            Number(linha.preco_final_unidade),
+            Number(linha.desconto),
+            linha.id_categoria,
+            linha.estoque,
+            linha.status
+        )
+    }
+
+    async listaProduto(): Promise<Produto[]>{
+        const linhas = await executarComandoSQL(
+            `SELECT * FROM produto`,
+            []
+        )
+        return linhas.map((linha: any) => this.mapearProduto(linha))
+    }
+
+    async listaProdutoPorId(id: number): Promise<Produto | null >{
+        const resultado = await executarComandoSQL(
+            `SELECT * FROM produto WHERE id_produto = ?`
+            ,[id]
+        )
+        return resultado.length > 0 ? this.mapearProduto(resultado[0]) : null
+    }
+
+    async listaProdutoPorCategoria(id_categoria: number): Promise<Produto[]>{
+        const linhas = await executarComandoSQL(
+            `SELECT * FROM produto WHERE id_categoria = ?`,
+            [id_categoria]
+        )
+        return linhas.map((linha: any) => this.mapearProduto(linha))
     }
 }
