@@ -9,5 +9,26 @@ export class CategoriaService{
         this.categoriaRepository = CategoriaRepository.getInstance();
     }
 
-    
+    async cadastrarCategoria(nome: string): Promise<Categoria | null>{
+        nome = nome.trim();
+        const limite = 100
+
+        if(!nome){
+            throw new Error("O nome da categoria é obrigatório");
+        }
+
+        if(nome.length > limite){
+            throw new Error("O limite máximo de caracteres é 100");
+        }
+
+        if(await this.categoriaRepository.existeCategoriaPorNome(nome)){
+            throw new Error("Já existe uma categoria com esse nome.");
+        }
+
+        const categoria = new Categoria(0, nome);
+
+        return await this.categoriaRepository.cadastraCategoria(categoria);
+    }
+
+
 }
