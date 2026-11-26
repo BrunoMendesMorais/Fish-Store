@@ -46,4 +46,32 @@ export class CompraController {
             }
         }
     }
+
+    async cancelarCompra(req: Request, res: Response){
+        try {
+
+
+        } catch(erro) {
+            if(erro instanceof ErrorApp)
+                res.status(erro.status).json(erro.message)
+            else {
+                console.error(erro);
+                res.status(500).json({ message: 'Erro do servidor.' });
+            }
+        }
+    }
+
+    async atualizaStatus(req: Request, res: Response){
+        try {
+            const compra = this.compraService.atualizaStatus(Number(req.params.id_compra))
+            res.status(201).json(compra) 
+        } catch(erro) {
+            if(erro instanceof ErrorApp)
+                res.status(erro.status).json(erro.message)
+            else {
+                console.error(erro);
+                res.status(500).json({ message: 'Erro do servidor.' });
+            }
+        }
+    }
 }
