@@ -1,4 +1,3 @@
-
 export class TipoPagamento {
     constructor(
         public id_pagamento: number,
