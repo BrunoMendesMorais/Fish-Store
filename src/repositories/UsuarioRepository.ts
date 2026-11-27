@@ -1,5 +1,6 @@
 import { Usuario } from "../models/Usuario";
 import { executarComandoSQL } from "../database/mysql";
+import { createHash } from "node:crypto";
 
 export class UsuarioRepository {
     private static instance: UsuarioRepository;
@@ -147,7 +148,9 @@ export class UsuarioRepository {
         return resultado.length > 0;
     }
 
-    async atualizarToken(id: number, token: string): Promise<boolean> {
+    async atualizarToken(id: number): Promise<boolean> {
+        const token = createHash(new Date().toISOString()+id)
+
         await executarComandoSQL(
             "UPDATE usuario SET token = ? WHERE id_cliente = ?",
             [token, id]
@@ -162,7 +165,7 @@ export class UsuarioRepository {
     }
 
     async encerrarSessao(id: number): Promise<boolean> {
-        return await this.atualizarToken(id, "");
+        return await this.atualizarToken(id);
     }
 
     async atualizarImagemPerfil(id: number, linkImagem: string | null): Promise<boolean> {
