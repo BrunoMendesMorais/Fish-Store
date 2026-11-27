@@ -59,23 +59,24 @@ class UsuarioService {
             throw new Error('Credenciais inválidas');
         }
 
-        const token = jwt.sign(
-            { id: usuario.id_cliente },
+        const tokenSalvo = await this.usuarioRepository.atualizarToken(
+            usuario.id_cliente,
+        );
+
+        const tokenSessao = jwt.sign(
+            { id: usuario.token },
             this.obterJwtSecret(),
             { expiresIn: '15m' }
         );
 
-        const tokenSalvo = await this.usuarioRepository.atualizarToken(
-            usuario.id_cliente,
-            token
-        );
+
 
         if (!tokenSalvo) {
             throw new Error('Não foi possível iniciar a sessão');
         }
 
         return {
-            token,
+            tokenSessao,
             usuario: this.dadosPublicos(usuario)
         };
     }
