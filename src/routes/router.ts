@@ -3,6 +3,7 @@ import { CarrinhoController } from '../controllers/carrinhoController';
 import { CompraController } from '../controllers/compraController';
 import { ItemCompraController } from '../controllers/itemCompraController';
 import { usuarioController } from '../controllers/UsuarioContoller';
+import { categoriaController } from '../controllers/categoriaController';
 
 const router = Router();
 const carrinhoController = new CarrinhoController();
@@ -24,5 +25,12 @@ router.get('/clientes/:id_cliente/compras/:id_compra/itens', (req, res) => itemC
 // Usuario
 router.post('/clientes', (req, res) => usuarioController.cadastrar(req, res));
 router.post('/clientes/login', (req, res) => usuarioController.login(req, res));
+
+// Categorias
+router.get('/categorias', (req, res) => categoriaController.listar(req, res));
+router.get('/categorias/:id', (req, res) => categoriaController.buscarPorId(req, res));
+router.post('/categorias', (req, res) => categoriaController.cadastrar(req, res));
+router.put('/categorias/:id', (req, res) => categoriaController.atualizar(req, res));
+router.delete('/categorias/:id', (req, res) => categoriaController.excluir(req, res));
 
 export default router;
