@@ -41,7 +41,7 @@ export class UsuarioController {
 
             const resultado = await UsuarioService.login(email, senha);
 
-            res.cookie('token', resultado.token, {
+            res.cookie('token', resultado.tokenSessao, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
