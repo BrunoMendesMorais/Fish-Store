@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CategoriaService } from "../services/categoriaService";
 
-export class categoriaController{
+export class CategoriaController{
     private categoriaService: CategoriaService;
 
     constructor(){
@@ -130,5 +130,39 @@ export class categoriaController{
         }
     }
 
+    async excluir(req: Request, res: Response): Promise<Response>{
+        try{
+            const id = Number(req.params.id);
 
+            if(!Number.isInteger(id) || id <= 0){
+                return res.status(400).json({
+                    mensagem: 'ID da categoria inválido'
+                });
+            }
+
+            await this.categoriaService.excluirCategoria(id);
+
+            return res.status(200).json({
+                mensagem: 'Categoria excluída com sucesso'
+            });
+        } catch (erro: unknown){
+            const mensagem = erro instanceof Error
+                ? erro.message
+                : 'Erro interno ao excluir categoria';
+            
+            let status = 500;
+
+            if(mensagem === 'Categoria não encontrada'){
+                status = 404;
+            } else if(
+                mensagem.includes('Produtos associados')
+            ) {
+                status = 409;
+            }
+
+            return res.status(status).json({mensagem})
+        }
+    }
 }
+
+export const categoriaController = new CategoriaController();
