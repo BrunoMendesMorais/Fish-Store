@@ -1,6 +1,6 @@
 import { Usuario } from "../models/Usuario";
 import { executarComandoSQL } from "../database/mysql";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 export class UsuarioRepository {
     private static instance: UsuarioRepository;
@@ -148,8 +148,8 @@ export class UsuarioRepository {
         return resultado.length > 0;
     }
 
-    async atualizarToken(id: number): Promise<boolean> {
-        const token = createHash(new Date().toISOString()+id)
+    async atualizarToken(id: number): Promise<string> {
+        const token = randomBytes(32).toString('hex');
 
         await executarComandoSQL(
             "UPDATE usuario SET token = ? WHERE id_cliente = ?",
@@ -157,15 +157,26 @@ export class UsuarioRepository {
         );
 
         const resultado = await executarComandoSQL(
-            "SELECT id_cliente FROM usuario WHERE id_cliente = ?",
+            "SELECT token FROM usuario WHERE id_cliente = ?",
             [id]
         );
 
-        return resultado.length > 0;
+        return resultado;
+    }
+
+    async getToken(id:number):Promise<string | null>{
+        return await executarComandoSQL(
+            "SELECT id_cliente, token FROM usuario WHERE id_cliente = ?",
+            [id]
+        )
     }
 
     async encerrarSessao(id: number): Promise<boolean> {
-        return await this.atualizarToken(id);
+        await executarComandoSQL(
+            "UPDATE usuario SET token = NULL WHERE id_cliente = ?",
+            [id]
+        );
+        return(true);
     }
 
     async atualizarImagemPerfil(id: number, linkImagem: string | null): Promise<boolean> {

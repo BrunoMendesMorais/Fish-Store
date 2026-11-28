@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UsuarioRepository } from '../repositories/UsuarioRepository';
 import { Usuario } from '../models/Usuario';
+import { ErrorApp } from '../models/Error';
 
 class UsuarioService {
     private usuarioRepository: UsuarioRepository = UsuarioRepository.getInstance();
@@ -46,8 +47,7 @@ class UsuarioService {
     }
 
     async login(email: string, senha: string) {
-        const usuario =
-            await this.usuarioRepository.listaUsuarioPorEmail(email);
+        const usuario = await this.usuarioRepository.listaUsuarioPorEmail(email);
 
         if (!usuario || !usuario.senha) {
             throw new Error('Credenciais inválidas');
@@ -63,17 +63,15 @@ class UsuarioService {
             usuario.id_cliente,
         );
 
+        if (!tokenSalvo) {
+            throw new ErrorApp(500, "Não foi possível iniciar a sessão");
+        }
+        
         const tokenSessao = jwt.sign(
-            { id: usuario.token },
+            { id: usuario.id_cliente, token: tokenSalvo },
             this.obterJwtSecret(),
             { expiresIn: '15m' }
         );
-
-
-
-        if (!tokenSalvo) {
-            throw new Error('Não foi possível iniciar a sessão');
-        }
 
         return {
             tokenSessao,
@@ -86,10 +84,8 @@ class UsuarioService {
             await this.usuarioRepository.encerrarSessao(idCliente);
 
         if (!sessaoEncerrada) {
-            throw new Error('Não foi possível encerrar a sessão');
+            throw new ErrorApp(403,'Não foi possível encerrar a sessão');
         }
-
-        return { mensagem: 'Sessão encerrada com sucesso' };
     }
 }
 

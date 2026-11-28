@@ -7,6 +7,7 @@ import { usuarioController } from '../controllers/UsuarioContoller';
 import { autenticar } from '../services/AutenticacaoService';
 
 const router = Router();
+
 const carrinhoController = new CarrinhoController();
 const compraController = new CompraController();
 const itemCompraController = new ItemCompraController();
@@ -30,7 +31,7 @@ router.post('/logout', (req, res) => usuarioController.logout(req, res));
 
 // Usuario
 router.post('/usuario', (req, res) => usuarioController.cadastrar(req, res));
-router.get('/usuario', (req, res) => usuarioController.listar(req, res));
+router.get('/usuario',autenticar, (req, res) => usuarioController.listar(req, res));
 router.patch('/usuario/imagem',autenticar,(req, res)=> usuarioController.atualizaImagem(req, res));
 router.put('/usuario',autenticar, (req, res) => usuarioController.atualizar(req, res));
 
