@@ -1,5 +1,6 @@
 import { Produto } from "../models/Produto";
 import { executarComandoSQL } from "../database/mysql";
+import { execArgv } from "node:process";
 
 export class ProdutoRepository {
     private static instance: ProdutoRepository
@@ -69,5 +70,72 @@ export class ProdutoRepository {
             [id_categoria]
         )
         return linhas.map((linha: any) => this.mapearProduto(linha))
+    }
+
+    async cadastrarProduto(produto: Produto): Promise<Produto | null>{
+        await executarComandoSQL(
+            `INSERT INTO produto (nome, descricao, preco_unidade, preco_final_unidade, desconto, id_categoria, estoque, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                produto.nome,
+                produto.descricao ?? null,
+                produto.preco_unidade,
+                produto.preco_final_unidade,
+                produto.desconto,
+                produto.id_categoria,
+                produto.estoque,
+                produto.status
+            ]
+        )
+        const resultado = await executarComandoSQL(
+            `SELECT * FROM produto WHERE id_produto = LAST_INSERT_ID()`
+        )
+        return resultado.length > 0 ? this.mapearProduto(resultado[0]) : null
+    }
+
+    async atualizarProduto(produto: Produto): Promise<boolean>{
+        await executarComandoSQL(
+            `UPDATE produto
+             SET
+                nome = ?,
+                descricao = ?,
+                preco_unidade = ?,
+                preco_final_unidade = ?,
+                desconto = ?,
+                id_categoria = ?,
+                estoque = ?,
+                status = ?
+            WHERE id_produto = ?`,
+            [
+                produto.nome,
+                produto.descricao ?? null,
+                produto.preco_unidade,
+                produto.preco_final_unidade,
+                produto.desconto,
+                produto.id_categoria,
+                produto.estoque,
+                produto.status,
+                produto.id_produto
+            ]
+        )
+        const resultado = await executarComandoSQL(
+            `SELECT id_produto FROM produto WHERE id_produto = ?`,
+            [produto.id_produto]
+        )
+        return resultado.length > 0
+    }
+
+    async deletarProduto(id: number): Promise<boolean>{
+        await executarComandoSQL(
+            "DELETE FROM produto WHERE id_produto = ?",
+            [id]
+        );
+
+        const resultado = await executarComandoSQL(
+            "SELECT id_produto FROM produto WHERE id_produto = ?",
+            [id]
+        );
+
+        return resultado.length === 0;
     }
 }
