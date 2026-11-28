@@ -1,6 +1,5 @@
 import { Produto } from "../models/Produto";
 import { executarComandoSQL } from "../database/mysql";
-import { execArgv } from "node:process";
 
 export class ProdutoRepository {
     private static instance: ProdutoRepository
@@ -27,7 +26,7 @@ export class ProdutoRepository {
         `;
     }
 
-    private static getInstance(): ProdutoRepository{
+    public static getInstance(): ProdutoRepository{
         if(!this.instance){
             this.instance = new ProdutoRepository()
         }
